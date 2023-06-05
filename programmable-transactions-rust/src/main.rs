@@ -1,5 +1,3 @@
-mod helpers;
-
 use std::str::FromStr;
 use anyhow::{anyhow, bail, ensure};
 use serde::{Deserialize, Serialize};
@@ -17,7 +15,7 @@ use sui_types::{
     transaction::Argument
 };
 use sui_sdk::{SuiClientBuilder, rpc_types::SuiTransactionBlockEffectsAPI};
-use crate::helpers::fetch_sorted_gas_coins;
+use common::fetch_sorted_gas_coins;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -142,7 +140,7 @@ async fn main() -> anyhow::Result<()> {
     ); // ignore the result, we will not use it in this PTB
 
     // 8: close the kiosk and retrieve the coin for the balance it contained
-    let second_item = 0;
+    let second_item = 1;
     let kiosk_owner_cap_arg = Argument::NestedResult(kiosk_result.to_owned(), second_item); // Point to the second item in the nested results of the kiosk creation.
     let close_and_withdraw_function = Identifier::from_str("close_and_withdraw")?; // https://github.com/MystenLabs/sui/blob/main/crates/sui-framework/packages/sui-framework/sources/kiosk/kiosk.move#L202-L218
     let remaining_kiosk_coin_result = pt_builder.programmable_move_call(

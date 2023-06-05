@@ -1,0 +1,13 @@
+[package]
+name = "single-gas-coin-transaction"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../common" }
+
+sui-sdk = { workspace = true }
+sui-types = { workspace = true }
+
+anyhow = { workspace = true }
+tokio = { version = "1" }

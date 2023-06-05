@@ -1,17 +1,12 @@
-[package]
-name = "sui-ptb-example"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+members = ["common", "programmable-transactions-rust", "single-gas-coin-transaction"]
 
-[dependencies]
+[workspace.dependencies]
 # Using a fork as vanilla sdk does not yet support dev_inspect (PR opened)
 sui-sdk = { git = "https://github.com/mrgnresearch/sui.git", branch = "man0s/rust-sdk-dev-inspect" }
 sui-types = { git = "https://github.com/mrgnresearch/sui.git", branch = "man0s/rust-sdk-dev-inspect" }
+bcs = "0.1.4"
 
 anyhow = "1"
 tokio = { version = "1" }
-bcs = "0.1.4"
-serde = "1.0.144"
-
-# Used to avoid current incompatible async-diesel/diesel resolution
-diesel-async = { version = "0.2.1", features = ["postgres", "deadpool"] }
+serde = "1"

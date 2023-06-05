@@ -1,0 +1,18 @@
+[package]
+name = "programmable-transactions-rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+common = { path = "../common" }
+
+sui-sdk = { workspace = true }
+sui-types = { workspace = true }
+bcs = { workspace = true }
+
+anyhow = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+
+# Used to avoid current incompatible async-diesel/diesel resolution
+diesel-async = { version = "0.2.1", features = ["postgres", "deadpool"] }
