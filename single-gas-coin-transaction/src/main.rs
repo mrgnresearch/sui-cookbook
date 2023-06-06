@@ -1,24 +1,22 @@
-use std::str::FromStr;
 use anyhow::{bail, ensure};
+use common::fetch_sorted_gas_coins;
+use std::str::FromStr;
+use sui_sdk::{
+    rpc_types::{SuiExecutionStatus::Success, SuiTransactionBlockEffectsAPI},
+    SuiClientBuilder,
+};
 use sui_types::{
     base_types::SuiAddress,
-    Identifier,
-    programmable_transaction_builder::ProgrammableTransactionBuilder,
-    TypeTag,
-    SUI_FRAMEWORK_PACKAGE_ID,
     coin,
-    transaction::{ObjectArg, TransactionData},
-    transaction::Argument,
+    programmable_transaction_builder::ProgrammableTransactionBuilder,
+    transaction::{Argument, Command, ObjectArg, TransactionData},
+    Identifier, TypeTag, SUI_FRAMEWORK_PACKAGE_ID,
 };
-use sui_sdk::{SuiClientBuilder};
-use sui_sdk::rpc_types::SuiExecutionStatus::Success;
-use sui_types::transaction::Command;
-use common::fetch_sorted_gas_coins;
-use sui_sdk::rpc_types::SuiTransactionBlockEffectsAPI;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let sender = SuiAddress::from_str("0xe719405821d7bd32ded86a2aed34f06f3dacd09c91241ec3f34b219ebeddc6f0")?;
+    let sender =
+        SuiAddress::from_str("0xe719405821d7bd32ded86a2aed34f06f3dacd09c91241ec3f34b219ebeddc6f0")?;
 
     let rpc_client = SuiClientBuilder::default()
         .build("https://fullnode.mainnet.sui.io:443")
@@ -31,13 +29,17 @@ async fn main() -> anyhow::Result<()> {
     ensure!(gas_coins.len() > 0, "Need at least 1 non-empty gas coin");
 
     let (primary_coin, primary_coin_balance) = gas_coins.first().unwrap();
-    ensure!(primary_coin_balance > &gas_budget, "Need the primary coin to have at least as much balance as the gas budget");
+    ensure!(
+        primary_coin_balance > &gas_budget,
+        "Need the primary coin to have at least as much balance as the gas budget"
+    );
 
     // ---------------------------------------------------------------------------------------------
     // Build naive PTB
 
     let mut pt_builder = ProgrammableTransactionBuilder::new();
-    let primary_coin_arg = pt_builder.obj(ObjectArg::ImmOrOwnedObject(primary_coin.object_ref()))?;
+    let primary_coin_arg =
+        pt_builder.obj(ObjectArg::ImmOrOwnedObject(primary_coin.object_ref()))?;
 
     // provide primary coin as unique gas payment object
     let gas_payment = vec![primary_coin.object_ref()];
@@ -79,9 +81,9 @@ async fn main() -> anyhow::Result<()> {
 
     // split the primary into a new usable coin for the PTB logic
     let usable_balance = pt_builder.pure(primary_coin_balance - gas_budget)?;
-// N.B.: the `Argument::GasCoin` points to the coin used for gas payment, which coincides with
-// `primary_coin_arg` here. However it would be incorrect to specify `primary_coin_arg` explicitly,
-// and would result in the same duplicate issue
+    // N.B.: the `Argument::GasCoin` points to the coin used for gas payment, which coincides with
+    // `primary_coin_arg` here. However it would be incorrect to specify `primary_coin_arg` explicitly,
+    // and would result in the same duplicate issue
     let Argument::Result(split_coin_result) = pt_builder.command(Command::SplitCoins(Argument::GasCoin, vec![usable_balance])) else { bail!("This outta be a Result") };
     let usable_coin = Argument::NestedResult(split_coin_result, 0);
 
@@ -109,7 +111,9 @@ async fn main() -> anyhow::Result<()> {
         .await;
 
     match result {
-        Ok(response) if response.effects.status() == &Success => println!("Good PTB succeeded as expected"),
+        Ok(response) if response.effects.status() == &Success => {
+            println!("Good PTB succeeded as expected")
+        }
         Ok(response) => bail!("Huh: {:?}", response),
         Err(e) => bail!("Huh {}", e),
     }
@@ -117,7 +121,11 @@ async fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn build_pt_logic(pt_builder: &mut ProgrammableTransactionBuilder, sender: &SuiAddress, coin: Argument) -> anyhow::Result<()> {
+fn build_pt_logic(
+    pt_builder: &mut ProgrammableTransactionBuilder,
+    sender: &SuiAddress,
+    coin: Argument,
+) -> anyhow::Result<()> {
     // get the balance of the provided coin
     let coin_value_result = pt_builder.programmable_move_call(
         SUI_FRAMEWORK_PACKAGE_ID,

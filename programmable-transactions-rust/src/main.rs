@@ -1,21 +1,17 @@
-use std::str::FromStr;
 use anyhow::{anyhow, bail, ensure};
-use serde::{Deserialize, Serialize};
-use sui_types::{
-    base_types::SuiAddress,
-    Identifier,
-    programmable_transaction_builder::ProgrammableTransactionBuilder,
-    TypeTag,
-    SUI_FRAMEWORK_PACKAGE_ID,
-    coin,
-    transaction::{ObjectArg, TransactionData, TransactionKind},
-    balance::Balance,
-    coin::Coin,
-    id::{ID, UID},
-    transaction::Argument
-};
-use sui_sdk::{SuiClientBuilder, rpc_types::SuiTransactionBlockEffectsAPI};
 use common::fetch_sorted_gas_coins;
+use serde::{Deserialize, Serialize};
+use std::str::FromStr;
+use sui_sdk::{rpc_types::SuiTransactionBlockEffectsAPI, SuiClientBuilder};
+use sui_types::{
+    balance::Balance,
+    base_types::SuiAddress,
+    coin::{self, Coin},
+    id::{ID, UID},
+    programmable_transaction_builder::ProgrammableTransactionBuilder,
+    transaction::{Argument, ObjectArg, TransactionData, TransactionKind},
+    Identifier, TypeTag, SUI_FRAMEWORK_PACKAGE_ID,
+};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -25,7 +21,8 @@ async fn main() -> anyhow::Result<()> {
     let mut pt_builder = ProgrammableTransactionBuilder::new();
 
     // Pick random address owning at least 2 non-empty SUI coin objects
-    let sender = SuiAddress::from_str("0x43b8f743162704af85214b0d0159fbef11aae0e996a8e9eac7fafda7fc5bd5f2")?;
+    let sender =
+        SuiAddress::from_str("0x43b8f743162704af85214b0d0159fbef11aae0e996a8e9eac7fafda7fc5bd5f2")?;
 
     let rpc_client = SuiClientBuilder::default()
         .build("https://fullnode.mainnet.sui.io:443")
@@ -42,7 +39,10 @@ async fn main() -> anyhow::Result<()> {
 
     let number_two_arg = pt_builder.pure(2u64)?;
 
-    let gas_payment = gas_coins[1..].iter().map(|(coin, _)| coin.object_ref()).collect::<Vec<_>>();
+    let gas_payment = gas_coins[1..]
+        .iter()
+        .map(|(coin, _)| coin.object_ref())
+        .collect::<Vec<_>>();
 
     // ---------------------------------------------------------------------------------------------
     // Programmable Transaction (PT) building
@@ -195,11 +195,7 @@ async fn main() -> anyhow::Result<()> {
 
     let response = rpc_client
         .read_api()
-        .dev_inspect_transaction_block(
-            sender,
-            tx_data,
-            None,
-            None)
+        .dev_inspect_transaction_block(sender, tx_data, None, None)
         .await?;
 
     if let Some(e) = response.error {
@@ -209,7 +205,11 @@ async fn main() -> anyhow::Result<()> {
 
     let execution_results = response.results.ok_or(anyhow!("There should be results"))?;
 
-    ensure!(execution_results.len() == 13, "There should be 13 results, one for each transaction in the block, found {}", execution_results.len());
+    ensure!(
+        execution_results.len() == 13,
+        "There should be 13 results, one for each transaction in the block, found {}",
+        execution_results.len()
+    );
 
     let (original_coin_value_bytes, _) = execution_results[0].clone().return_values[0].clone();
     let original_coin_value: u64 = bcs::from_bytes(&original_coin_value_bytes)?;
@@ -225,7 +225,10 @@ async fn main() -> anyhow::Result<()> {
     let new_coin: Coin = bcs::from_bytes(&new_coin_bytes)?;
     println!("--> tx 2");
     println!("new_coin: {:?}", new_coin);
-    ensure!(new_coin.value() == new_coin_value_target, "New coin value should be equal to the target value");
+    ensure!(
+        new_coin.value() == new_coin_value_target,
+        "New coin value should be equal to the target value"
+    );
 
     let (new_coin_value_bytes, _) = execution_results[3].clone().return_values[0].clone();
     let new_coin_value: u64 = bcs::from_bytes(&new_coin_value_bytes)?;
@@ -261,7 +264,10 @@ async fn main() -> anyhow::Result<()> {
     let (diff_bytes, _) = execution_results[10].clone().return_values[0].clone();
     let diff: u64 = bcs::from_bytes(&diff_bytes)?;
     println!("diff: {}", diff);
-    ensure!(diff == original_coin_value.abs_diff(new_coin_value), "Absolute difference should match");
+    ensure!(
+        diff == original_coin_value.abs_diff(new_coin_value),
+        "Absolute difference should match"
+    );
 
     println!("--> tx 11");
 
@@ -271,12 +277,12 @@ async fn main() -> anyhow::Result<()> {
     // Verify dry run succeeds
 
     let tx_data = TransactionData::new_programmable(
-                sender,
-                gas_payment,
-                pt,
-                100_000_000,
-                gas_price.to_owned(),
-            );
+        sender,
+        gas_payment,
+        pt,
+        100_000_000,
+        gas_price.to_owned(),
+    );
 
     let response = rpc_client
         .read_api()
@@ -318,7 +324,7 @@ struct Kiosk {
     profits: Balance,
     owner: SuiAddress,
     item_count: u32,
-    allow_extensions: bool
+    allow_extensions: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
