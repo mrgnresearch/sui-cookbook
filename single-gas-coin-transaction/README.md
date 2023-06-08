@@ -2,7 +2,29 @@
 
 ## Bad
 
-[![](https://mermaid.ink/img/pako:eNpdUV1PwyAU_Svk7kWTtqG11pUlvrg9-KAPbj7oWBZScCW20CDMza7_faxVMyWBC_ece7gfLRSaCyBA1VulP4uSGYsWU6qQX7PHxdPLcjlT1uyRVI2zH6vVAOELvEsIKbRUhGxZ5cTlAMQDUDNbEsLlVnKxZoqvjXb-dI2nnYmjMLw9UGiMrJn_4ySHQnTnzaiyk_nz_WhjJxQOCP8Pyj3PZekBxd8J9d4_Qn1avzQIoBamZpL7attTEAVbilpQIP7KmXmnvgud5zFn9XyvCiDWOBGAazizYirZxrD6x9kw9ar1-RNICzsgGcZRGqd5Mo7TbDzGSQB7IEmaRPgqz3K_YxxnN0kXwFcvgKPrAASXVpuHYRj9TLojB5d-Eg?type=png)](https://mermaid.live/edit#pako:eNpdUV1PwyAU_Svk7kWTtqG11pUlvrg9-KAPbj7oWBZScCW20CDMza7_faxVMyWBC_ece7gfLRSaCyBA1VulP4uSGYsWU6qQX7PHxdPLcjlT1uyRVI2zH6vVAOELvEsIKbRUhGxZ5cTlAMQDUDNbEsLlVnKxZoqvjXb-dI2nnYmjMLw9UGiMrJn_4ySHQnTnzaiyk_nz_WhjJxQOCP8Pyj3PZekBxd8J9d4_Qn1avzQIoBamZpL7attTEAVbilpQIP7KmXmnvgud5zFn9XyvCiDWOBGAazizYirZxrD6x9kw9ar1-RNICzsgGcZRGqd5Mo7TbDzGSQB7IEmaRPgqz3K_YxxnN0kXwFcvgKPrAASXVpuHYRj9TLojB5d-Eg)
+```mermaid
+flowchart TD
+  ENTRY[[Entry inputs]]
+  0(0x2::coin::value)
+  1(0x2::math::divide_and_round_up)
+
+  ENTRY -->|"primary coin - Coin#lt;SUI#gt;"| 0
+  ENTRY -->|9 - u64| 1
+  0 -->|primary coin value - u64| 1
+```
 
 ## Good
-[![](https://mermaid.ink/img/pako:eNpdUU9PwjAU_yrN84LJIN2cE0riRYjxoAfBgzIyHrRA49YtXYsg8N3tNjCEJm363u9f2reHRc4FMFim-c9ijdqQ8SBWxK3h2_j9czIZKqN3RKrCmnI6bSDaUmjkRpCnXKpRkUpz2wB-i24DxhauzdgGUytOQNAAGZo1Y1xuJBcJKp7o3LrTFo52kUra7cfDM5aV_YHQa2RWaJmh3iVVTlLHkDZZYZnMLV8JM3OVjcJ_Ja1VMdgS56kglcoxKvOb1PRHHy83K9OP4UD866Te2Sk4va_uXvqc0xsWeJAJnaHk7kv3lSYGsxaZiIG5K0f9HUOsjo6H1uSjnVoAM9oKD2zB0YiBxJXGDNgS09J1C1RfeZ6dSa4EtoctsIjSTuiHvaDrh1G3SwMPdsCCMOjQu17Uc9unfvQQHD34rQ1o594DwaXJ9Wsz8nryxz8fZJ2g?type=png)](https://mermaid.live/edit#pako:eNpdUU9PwjAU_yrN84LJIN2cE0riRYjxoAfBgzIyHrRA49YtXYsg8N3tNjCEJm363u9f2reHRc4FMFim-c9ijdqQ8SBWxK3h2_j9czIZKqN3RKrCmnI6bSDaUmjkRpCnXKpRkUpz2wB-i24DxhauzdgGUytOQNAAGZo1Y1xuJBcJKp7o3LrTFo52kUra7cfDM5aV_YHQa2RWaJmh3iVVTlLHkDZZYZnMLV8JM3OVjcJ_Ja1VMdgS56kglcoxKvOb1PRHHy83K9OP4UD866Te2Sk4va_uXvqc0xsWeJAJnaHk7kv3lSYGsxaZiIG5K0f9HUOsjo6H1uSjnVoAM9oKD2zB0YiBxJXGDNgS09J1C1RfeZ6dSa4EtoctsIjSTuiHvaDrh1G3SwMPdsCCMOjQu17Uc9unfvQQHD34rQ1o594DwaXJ9Wsz8nryxz8fZJ2g)
+
+```mermaid
+flowchart TD
+  ENTRY[[Entry inputs]]
+  0(native CoinSplit)
+  1(0x2::coin::value)
+  2(0x2::math::divide_and_round_up)
+
+  ENTRY -->|GasCoin| 0
+  ENTRY -->|`primary_coin_value - gas_budget` - u64| 0
+  0 -->|"usable coin - Coin#lt;SUI#gt;"| 1
+  ENTRY -->|9 - u64| 2
+  1 -->|usable coin value - u64| 2
+```
